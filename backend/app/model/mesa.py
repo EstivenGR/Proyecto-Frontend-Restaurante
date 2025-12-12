@@ -7,7 +7,7 @@ class Mesa(Base):
     __tablename__ = "mesas"
 
     id = Column(Integer, primary_key=True, index=True)
-    numero = Column(String(10), unique=True, nullable=False)   # e.g. "M1", "10"
+    numero = Column(String(10), unique=True, nullable=False)  
     capacidad = Column(Integer, nullable=False, default=2)
 
     reservas = relationship("Reserva", back_populates="mesa", cascade="all, delete-orphan")
