@@ -12,7 +12,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="API Reservas - Restaurante", version="1.0")
 
-# CORS para que el frontend pueda consultar la API
+# CORS para que el frontend consulte la API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
