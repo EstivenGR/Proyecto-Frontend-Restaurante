@@ -1,37 +1,58 @@
-# app/crud/reserva_crud.py
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from sqlalchemy import func
+from typing import List, Optional
+from datetime import date
 from app.model.reserva import Reserva
-from app.schemas.reserva_schema import ReservaCreate
-from datetime import date, datetime, timedelta
+from app.model.cliente import Cliente 
+from app.model.mesa import Mesa      
+from app.schemas.reserva_schema import ReservaCreate, ReservaRead
+from app.presentation.crud.mesa_crud import set_mesa_status 
+from app.schemas.mesa_status import EstadoMesa 
 
-def is_mesa_available(db: Session, mesa_id: int, start_time: datetime) -> bool:
-    # Revisa si ya existe una reserva exacta para la misma mesa y hora
+
+def is_mesa_available(db: Session, mesa_id: int, target_date: date) -> bool:
     existing = db.query(Reserva).filter(
         Reserva.mesa_id == mesa_id,
-        Reserva.start_time == start_time
+        Reserva.start_time == target_date
     ).first()
     return existing is None
 
 def create_reserva(db: Session, reserva_in: ReservaCreate) -> Reserva:
-    # validación en aplicación: disponibilidad
-    if not is_mesa_available(db, reserva_in.mesa_id, reserva_in.start_time):
-        raise ValueError("La mesa ya está reservada para esa fecha/hora")
+    if not is_mesa_available(db, reserva_in.mesa_id, reserva_in.fecha_reserva):
+        raise ValueError("La mesa ya está reservada para esa fecha")
 
-    reserva = Reserva(**reserva_in.dict())
+    reserva_data = reserva_in.model_dump(by_alias=False)
+    reserva_data['start_time'] = reserva_data.pop('fecha_reserva') 
+    
+    reserva = Reserva(**reserva_data)
     db.add(reserva)
     db.commit()
     db.refresh(reserva)
+
+    set_mesa_status(db, reserva_in.mesa_id, EstadoMesa.RESERVADA)
+    
     return reserva
 
-def list_reservas_del_dia(db: Session, target_date: date):
-    # Devuelve todas las reservas cuyo start_time esté en la fecha target_date
-    start_dt = datetime.combine(target_date, datetime.min.time())
-    end_dt = datetime.combine(target_date, datetime.max.time())
-    return db.query(Reserva).filter(
-        Reserva.start_time >= start_dt,
-        Reserva.start_time <= end_dt
-    ).order_by(Reserva.start_time).all()
+def list_reservas_by_date(db: Session, target_date: date) -> List[ReservaRead]:
 
-def get_reserva(db: Session, reserva_id: int):
+    reservas_con_datos = db.query(
+        Reserva.id,
+        Reserva.start_time.label('fecha_reserva'),
+        Reserva.requerimientos,
+        Cliente.nombre.label('nombre_cliente'),
+        Mesa.numero.label('numero_mesa')
+    ).join(Cliente, Reserva.cliente_id == Cliente.id
+    ).join(Mesa, Reserva.mesa_id == Mesa.id
+    ).filter(
+        Reserva.start_time == target_date
+    ).order_by(Reserva.start_time).all()
+    
+    return [ReservaRead.model_validate(r._asdict()) for r in reservas_con_datos]
+
+def get_reserva(db: Session, reserva_id: int) -> Optional[Reserva]:
     return db.query(Reserva).filter(Reserva.id == reserva_id).first()
+
+def delete_reserva(db: Session, reserva: Reserva):
+    set_mesa_status(db, reserva.mesa_id, EstadoMesa.DISPONIBLE)
+    db.delete(reserva)
+    db.commit()
