@@ -1,15 +1,26 @@
-# app/schemas/mesa_schema.py
-from pydantic import BaseModel
+# app/schemas/mesa_schema.py (SOLUCIÓN - RENOMBRAR)
+
+from pydantic import BaseModel, Field
 from typing import Optional
+from .mesa_status import EstadoMesa 
 
-class MesaCreate(BaseModel):
-    numero: str
-    capacidad: int
+class MesaBase(BaseModel):
+    # ... (código MesaBase, MesaCreate, MesaUpdate sin cambios) ...
+    numero: str = Field(..., max_length=10)
+    capacidad: int = Field(..., gt=0)
+    estado: Optional[EstadoMesa] = Field(default=EstadoMesa.DISPONIBLE) 
 
-class MesaRead(BaseModel):
+class MesaCreate(MesaBase):
+    pass
+
+class MesaUpdate(MesaBase):
+    numero: Optional[str] = None
+    capacidad: Optional[int] = None
+    estado: Optional[EstadoMesa] = None
+
+
+class MesaRead(MesaBase):
     id: int
-    numero: str
-    capacidad: int
-
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
