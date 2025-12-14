@@ -1,22 +1,18 @@
 import { render } from 'preact';
 import { LocationProvider, Router, Route } from 'preact-iso';
-
-import { Header } from './components/Header.jsx';
-import { Home } from './pages/Home/index.jsx';
-import { NotFound } from './pages/_404.jsx';
+import Landing from './pages/Landing';
+import Reserva from './pages/Reserva';
 import './tailwind.css';
-
 
 export function App() {
 	return (
 		<LocationProvider>
-			<Header />
-			<main>
+			<div class="w-full min-h-screen">
 				<Router>
-					<Route path="/" component={Home} />
-					<Route default component={NotFound} />
+					<Route path="/" component={Landing} />
+					<Route path="/reserva" component={Reserva} />
 				</Router>
-			</main>
+			</div>
 		</LocationProvider>
 	);
 }
