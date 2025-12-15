@@ -31,7 +31,7 @@ const renderStepContent = (step, nextStep) => {
                     
                     {/* Opcional: Botón para volver a la página de inicio o reiniciar */}
                     <button 
-                        onClick={() => window.location.reload()}
+                        onClick={() => globalThis.location.reload()}
                         className="mt-6 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-150"
                     >
                         Realizar otra reserva
@@ -75,11 +75,11 @@ const Reserva = () => {
 
     const handleConfirmarReserva = async () => {
         const fechaSolo = fechaReserva;
-
-        if (!clienteId || !mesaId || !fechaSolo) {
-        setError("Faltan datos críticos para confirmar la reserva.");
-        return;
-    }
+// 🛑 CORRECCIÓN: Aseguramos que horaReserva no sea nula antes de enviar 🛑
+        if (!clienteId || !mesaId || !fechaSolo || !horaReserva) { 
+            setFinalError("Faltan datos críticos para confirmar la reserva (fecha u hora).");
+            return;
+        }
 
         setIsConfirming(true);
         setFinalError(null);
@@ -88,7 +88,8 @@ const Reserva = () => {
             const dataToSend = {
                 cliente_id: clienteId,
                 mesa_id: mesaId,
-                fecha_reserva: fechaSolo, 
+                fecha_reserva: fechaSolo,
+                hora_reserva: horaReserva, 
                 requerimientos: requerimientoEspecial || null 
             };
             
@@ -212,7 +213,7 @@ const Reserva = () => {
 
                 {/* --- 2. NUEVA TARJETA DE RESERVAS DEL DÍA (Lado Derecho) --- */}
                 {/* Solo mostramos esta tarjeta si NO estamos en el paso de éxito (step < 4) */}
-                {step < 4 && (
+                {step == 1 && (
                     <div className="w-full max-w-sm">
                         <ReservaDiaria /> 
                     </div>
