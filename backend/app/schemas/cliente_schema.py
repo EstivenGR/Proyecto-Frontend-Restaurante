@@ -1,4 +1,3 @@
-# app/schemas/cliente_schema.py
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 

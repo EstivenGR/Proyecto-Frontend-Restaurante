@@ -1,4 +1,3 @@
-# app/crud/cliente_crud.py
 from sqlalchemy.orm import Session
 from app.model.cliente import Cliente
 from app.schemas.cliente_schema import ClienteCreate

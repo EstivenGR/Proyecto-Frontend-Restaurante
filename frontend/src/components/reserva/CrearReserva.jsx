@@ -1,9 +1,6 @@
-// src/components/reserva/CrearReserva.jsx
-
 import React, { useState, useEffect } from 'preact/compat';
 import { ReservaStore } from '../../store/ReservaStore'; 
 
-// Usamos la variable de entorno para el acceso
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const CrearReserva = () => {
@@ -16,25 +13,17 @@ const CrearReserva = () => {
         setMesasDisponibles
     } = ReservaStore();
 
-    // ESTADOS LOCALES para manejar las mesas que vienen de la API
-    const [mesas, setMesas] = useState([]); // Aquí guardaremos las mesas reales
+    const [mesas, setMesas] = useState([]);
     const [isLoadingMesas, setIsLoadingMesas] = useState(false);
     const [errorMesas, setErrorMesas] = useState(null);
-    
-    // Horarios Fijos que ofrecemos
     const horariosDisponibles = ["18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
-
-
-    // 3. FUNCIÓN PARA OBTENER MESAS DISPONIBLES DE LA API
     const fetchMesas = async () => {
         setIsLoadingMesas(true);
         setErrorMesas(null);
 
-        // La API espera un string "disponible" o "reservada" en el query param 'estado'
         const estadoFiltro = 'disponible'; 
         
         try {
-            // 🌟 Llama a tu endpoint de FastAPI filtrando por estado="disponible"
             const response = await fetch(`${API_BASE_URL}/mesas/?estado=${estadoFiltro}`, {
                 method: 'GET',
                 headers: {
@@ -43,13 +32,12 @@ const CrearReserva = () => {
             });
 
             if (!response.ok) {
-                // Capturamos el error si FastAPI no devuelve 200
                 const errorBody = await response.json();
                 throw new Error(errorBody.detail || 'Error al cargar las mesas disponibles.');
             }
 
             const data = await response.json();
-            setMesas(data); // Guardamos la lista de mesas disponibles
+            setMesas(data);
             setMesasDisponibles(data);
             
         } catch (error) {
@@ -60,16 +48,12 @@ const CrearReserva = () => {
         }
     };
 
-    // 4. useEffect para cargar las mesas al inicio del componente
     useEffect(() => {
         fetchMesas();
-    }, []); // Se ejecuta solo una vez al montar el componente
+    }, []);
     
-    // ------------------------------------------------------------------
-
     return (
         <div className="space-y-6">
-            {/* 1. Fecha de Reserva */}
             <div>
                 <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">Fecha</label>
                 <input
@@ -80,12 +64,10 @@ const CrearReserva = () => {
                     value={fechaReserva || ''}
                     onChange={(e) => {
                         setFechaReserva(e.target.value);
-                        // NOTA: En el futuro, fetchMesas() debe recargarse aquí para obtener la disponibilidad por fecha/hora
                     }}
                 />
             </div>
 
-            {/* 2. Selección de Hora (Horarios Fijos) */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Hora de Reserva</label>
                 <div className="flex flex-wrap gap-2">
@@ -94,7 +76,6 @@ const CrearReserva = () => {
                             key={hora}
                             onClick={() => {
                                 setHoraReserva(hora);
-                                // NOTA: En el futuro, fetchMesas() debe recargarse aquí para obtener la disponibilidad por fecha/hora
                             }}
                             className={`px-3 py-1 text-sm rounded-full transition duration-150 ${
                                 horaReserva === hora 
@@ -108,7 +89,6 @@ const CrearReserva = () => {
                 </div>
             </div>
 
-            {/* 3. Selección de Mesa - AHORA CON DATOS REALES DE LA API */}
             <div className='pt-2'>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Mesa Disponible (Número / Capacidad)</label>
                 
@@ -125,8 +105,6 @@ const CrearReserva = () => {
                     {mesas.map(mesa => (
                         <button
                             key={mesa.id}
-                            // Como ya filtramos por estado="disponible" en el GET, 
-                            // todas las mesas aquí son seleccionables.
                             onClick={() => setMesaId(mesa.id)}
                             className={`p-3 rounded-lg text-center transition duration-150 border-2 ${
                                 mesaId === mesa.id
@@ -134,15 +112,12 @@ const CrearReserva = () => {
                                     : 'bg-white text-gray-800 border-gray-300 hover:border-red-500'
                             }`}
                         >
-                            {/* Mostramos el número y la capacidad de la mesa */}
                             <span className="font-semibold">{mesa.numero}</span> 
                             <span className="block text-xs">Cap: {mesa.capacidad}</span>
                         </button>
                     ))}
                 </div>
             </div>
-
-            {/* 4. Requerimientos Especiales (Opcional) */}
             <div>
                 <label htmlFor="requerimientos" className="block text-sm font-medium text-gray-700">Requerimientos Especiales (Opcional)</label>
                 <textarea

@@ -1,4 +1,3 @@
-# app/models/cliente.py
 from sqlalchemy import Column, Integer, String
 from app.configuration.database import Base
 from sqlalchemy.orm import relationship

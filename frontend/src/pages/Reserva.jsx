@@ -1,5 +1,3 @@
-// src/pages/Reserva.jsx
-
 import React, { useState } from 'preact/compat';
 import { ReservaStore } from '../store/ReservaStore';
 import FondoRestaurante from '../assets/images/reserva.jpg';
@@ -11,7 +9,6 @@ import ReservaDiaria from '../components/reserva/ReservaDiaria';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// FUNCIÓN DE RENDERIZADO (Se mantiene igual)
 const renderStepContent = (step, nextStep) => {
     switch (step) {
         case 1:
@@ -23,13 +20,11 @@ const renderStepContent = (step, nextStep) => {
         default:
            return (
                 <div className="text-center p-8 bg-white border-2 border-green-500 rounded-xl shadow-lg">
-                    {/* Icono simple de éxito (puedes reemplazarlo por un SVG) */}
                     <svg className="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    
+
                     <h3 className="text-3xl font-bold text-green-600 mt-4 mb-2">¡Reserva Exitosa!</h3>
                     <p className="text-gray-700">Tu mesa ha sido reservada correctamente.</p>
                     
-                    {/* Opcional: Botón para volver a la página de inicio o reiniciar */}
                     <button 
                         onClick={() => globalThis.location.reload()}
                         className="mt-6 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-150"
@@ -75,7 +70,6 @@ const Reserva = () => {
 
     const handleConfirmarReserva = async () => {
         const fechaSolo = fechaReserva;
-// 🛑 CORRECCIÓN: Aseguramos que horaReserva no sea nula antes de enviar 🛑
         if (!clienteId || !mesaId || !fechaSolo || !horaReserva) { 
             setFinalError("Faltan datos críticos para confirmar la reserva (fecha u hora).");
             return;
@@ -114,39 +108,26 @@ const Reserva = () => {
         }
     };
 
-
     return (
         <div
             className="min-h-screen flex justify-center items-center p-5"
             style={backgroundStyle}
         >
-            {/* Capa oscura de 50% de opacidad */}
             <div className="absolute inset-0 bg-black/50"></div> 
-
-            {/* 🛑 CONTENEDOR FLEXIBLE PRINCIPAL: Contiene ambas tarjetas (4xl es un buen tamaño) 🛑 */}
             <div className="flex w-full max-w-4xl relative z-10 gap-6 justify-center">
-            
-                {/* --- 1. TARJETA DE RESERVA ACTUAL (Lado Izquierdo, Flujo Principal) --- */}
                 <div
                     className="bg-gray-100 p-8 rounded-xl shadow-2xl w-full max-w-sm text-gray-900" 
                 >
-                    {/* 🌟 REESTRUCTURA DEL ENCABEZADO 🌟 */}
                     <div className="flex items-center justify-center mb-4 space-x-3"> 
-                        
-                        {/* LOGO */}
                         <img 
                             src={LogoPresik} 
                             alt="Logo BarPresik" 
                             className="h-12 w-auto" 
                         />
-                        
-                        {/* TÍTULO */}
                         <h2 className="text-3xl font-bold text-orange-600">
                             Reserva tu Mesa
                         </h2>
                     </div>
-
-                    {/* 2. BARRA DE PROGRESO (Debajo del Título) */}
                     {step < 4 && (
                         <div className="mb-6 pt-2 border-t border-gray-300"> 
                             <div className="flex justify-between items-center mb-2">
@@ -161,32 +142,22 @@ const Reserva = () => {
                             </div>
                         </div>
                     )}
-
-
-                    {/* Mostrar error global de confirmación */}
                     {finalError && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                             {finalError}
                         </div>
                     )}
 
-                    {/* Contenido Dinámico del Paso */}
                     <div className="pb-4">
                         {renderStepContent(step, nextStep)} 
                     </div>
-
-                    {/* CONTROLES DE NAVEGACIÓN (Botón Atrás + Siguiente/Confirmar) */}
                     
                     {step > 1 && step < 4 && (
                         <div className="mt-4 pt-4 border-t border-gray-200">
                             <div className="flex justify-between">
-
-                                {/* Botón Atrás */}
                                 <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-150" onClick={prevStep}>
                                     Atrás
                                 </button>
-
-                                {/* BOTÓN PRINCIPAL (Siguiente / Confirmar) */}
                                 <button
                                     onClick={step === 3 ? handleConfirmarReserva : nextStep}
                                     disabled={!canAdvance()}
@@ -194,8 +165,8 @@ const Reserva = () => {
                                         !canAdvance() || isConfirming
                                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                             : step === 3 
-                                                ? 'bg-green-600 hover:bg-green-700 text-white' // Usamos VERDE para confirmar
-                                                : 'bg-orange-600 hover:bg-orange-700 text-white' // NARANJA para siguiente
+                                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                : 'bg-orange-600 hover:bg-orange-700 text-white'
                                         }`}
                                 >
                                     {isConfirming
@@ -209,17 +180,12 @@ const Reserva = () => {
                     )}
 
                 </div>
-                {/* --- FIN DE LA TARJETA 1 --- */}
-
-                {/* --- 2. NUEVA TARJETA DE RESERVAS DEL DÍA (Lado Derecho) --- */}
-                {/* Solo mostramos esta tarjeta si NO estamos en el paso de éxito (step < 4) */}
                 {step == 1 && (
                     <div className="w-full max-w-sm">
                         <ReservaDiaria /> 
                     </div>
                 )}
             </div>
-            {/* 🛑 FIN DEL CONTENEDOR FLEXIBLE 🛑 */}
         </div>
     );
 };
