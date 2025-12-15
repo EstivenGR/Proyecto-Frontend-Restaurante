@@ -20,10 +20,25 @@ const renderStepContent = (step, nextStep) => {
         case 3:
             return <ConfirmacionFinal />;
         default:
-            return <div className="text-center text-3xl font-bold text-orange-500">¡Reserva Completada con Éxito!</div>;
+           return (
+                <div className="text-center p-8 bg-white border-2 border-green-500 rounded-xl shadow-lg">
+                    {/* Icono simple de éxito (puedes reemplazarlo por un SVG) */}
+                    <svg className="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    
+                    <h3 className="text-3xl font-bold text-green-600 mt-4 mb-2">¡Reserva Exitosa!</h3>
+                    <p className="text-gray-700">Tu mesa ha sido reservada correctamente.</p>
+                    
+                    {/* Opcional: Botón para volver a la página de inicio o reiniciar */}
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="mt-6 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-150"
+                    >
+                        Realizar otra reserva
+                    </button>
+                </div>
+            );
     }
 };
-
 
 const Reserva = () => {
 
@@ -58,12 +73,12 @@ const Reserva = () => {
     }
 
     const handleConfirmarReserva = async () => {
-        const fechaHoraCompleta = fechaReserva && horaReserva ? `${fechaReserva}T${horaReserva}:00` : null;
+        const fechaSolo = fechaReserva;
 
-        if (!clienteId || !mesaId || !fechaHoraCompleta) {
-            setFinalError("Faltan datos críticos para confirmar la reserva.");
-            return;
-        }
+        if (!clienteId || !mesaId || !fechaSolo) {
+        setError("Faltan datos críticos para confirmar la reserva.");
+        return;
+    }
 
         setIsConfirming(true);
         setFinalError(null);
@@ -72,8 +87,8 @@ const Reserva = () => {
             const dataToSend = {
                 cliente_id: clienteId,
                 mesa_id: mesaId,
-                fecha_reserva: fechaHoraCompleta, 
-                requerimiento: requerimientoEspecial || null 
+                fecha_reserva: fechaSolo, 
+                requerimientos: requerimientoEspecial || null 
             };
             
             const response = await fetch(`${API_BASE_URL}/reservas/`, {
@@ -126,18 +141,20 @@ const Reserva = () => {
                 </div>
 
                 {/* 2. BARRA DE PROGRESO (Debajo del Título) */}
-                <div className="mb-6 pt-2 border-t border-gray-300"> {/* pt-2 separa del título */}
-                    <div className="flex justify-between items-center mb-2">
-                        <small className="text-sm text-gray-500">Paso {step} de 3: {stepTitle}</small>
-                    </div>
-                    <div className="w-full bg-gray-300 rounded-full h-2.5">
-                        <div
-                            className="bg-orange-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
-                            style={{ width: `${progress}%` }}
-                        >
+                {step < 4 && (
+                    <div className="mb-6 pt-2 border-t border-gray-300"> {/* pt-2 separa del título */}
+                        <div className="flex justify-between items-center mb-2">
+                            <small className="text-sm text-gray-500">Paso {step} de 3: {stepTitle}</small>
+                        </div>
+                        <div className="w-full bg-gray-300 rounded-full h-2.5">
+                            <div
+                                className="bg-orange-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+                                style={{ width: `${progress}%` }}
+                            >
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
 
                 {/* Mostrar error global de confirmación */}

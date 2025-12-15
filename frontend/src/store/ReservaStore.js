@@ -14,6 +14,8 @@ export const ReservaStore = create((set) => ({
     mesaId: null,    // 👈 CORREGIDO: Usamos mesaId para ser consistente con la API
     requerimientoEspecial: '', // 👈 AÑADIDO: Necesario para requerimientos
 
+    mesasDisponibles: [],
+
     // DATOS DEL CLIENTE (Paso 1)
     datosCliente: {
         nombre: '',
@@ -31,7 +33,6 @@ export const ReservaStore = create((set) => ({
 
     // 2. SETTERS DEL PASO 1
     setClienteId: (id) => set({ clienteId: id }),
-    
     setDatosCliente: (key, value) => set((state) => ({
         datosCliente: {
             ...state.datosCliente,
@@ -45,6 +46,7 @@ export const ReservaStore = create((set) => ({
     setMesaId: (id) => set({ mesaId: id }),
     setRequerimientoEspecial: (req) => set({ requerimientoEspecial: req }),
 
+    setMesasDisponibles: (mesas) => set({ mesasDisponibles: mesas }),
 
     // 4. RESET
     resetStore: () => set({
@@ -54,6 +56,7 @@ export const ReservaStore = create((set) => ({
         horaReserva: '', // 👈 Resetear hora
         mesaId: null,    // 👈 Resetear mesa
         requerimientoEspecial: '', // 👈 Resetear requerimientos
+        mesasDisponibles: [],
         datosCliente: { nombre: '', telefono: '', email: '', cedula: '' },
     })
 }));

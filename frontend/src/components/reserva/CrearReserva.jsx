@@ -12,7 +12,8 @@ const CrearReserva = () => {
         fechaReserva, setFechaReserva,
         horaReserva, setHoraReserva,
         mesaId, setMesaId,
-        requerimientoEspecial, setRequerimientoEspecial
+        requerimientoEspecial, setRequerimientoEspecial,
+        setMesasDisponibles
     } = ReservaStore();
 
     // ESTADOS LOCALES para manejar las mesas que vienen de la API
@@ -21,7 +22,7 @@ const CrearReserva = () => {
     const [errorMesas, setErrorMesas] = useState(null);
     
     // Horarios Fijos que ofrecemos
-    const horariosDisponibles = ["18:00", "19:00", "20:00", "21:00", "22:00"];
+    const horariosDisponibles = ["18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
 
 
     // 3. FUNCIÓN PARA OBTENER MESAS DISPONIBLES DE LA API
@@ -49,6 +50,7 @@ const CrearReserva = () => {
 
             const data = await response.json();
             setMesas(data); // Guardamos la lista de mesas disponibles
+            setMesasDisponibles(data);
             
         } catch (error) {
             console.error("Error al obtener mesas:", error);
@@ -67,11 +69,6 @@ const CrearReserva = () => {
 
     return (
         <div className="space-y-6">
-            
-            <h3 className="text-xl font-semibold border-b pb-2 text-red-600">
-                Selección de Fecha, Hora y Mesa
-            </h3>
-            
             {/* 1. Fecha de Reserva */}
             <div>
                 <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">Fecha</label>
