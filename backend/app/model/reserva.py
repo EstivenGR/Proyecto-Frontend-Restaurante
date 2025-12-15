@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Date, Text, UniqueConstraint 
+from sqlalchemy import Column, Integer, ForeignKey, Date, Text, UniqueConstraint, String
 from app.configuration.database import Base
 from sqlalchemy.orm import relationship
 from datetime import date 
@@ -6,7 +6,7 @@ from datetime import date
 class Reserva(Base):
     __tablename__ = "reserva"
     __table_args__ = (
-        UniqueConstraint("mesa_id", "start_time", name="uq_mesa_start_time"),
+        UniqueConstraint("mesa_id", "start_time", "hora_reserva", name="uq_mesa_fecha_hora"),
     )
 
     id = Column(Integer, primary_key=True, index=True)
@@ -14,6 +14,8 @@ class Reserva(Base):
     mesa_id = Column(Integer, ForeignKey("mesa.id", ondelete="CASCADE"), nullable=False)
     
     start_time = Column(Date, nullable=False, index=True)  
+    
+    hora_reserva = Column(String(5), nullable=False)
     
     requerimientos = Column(Text, nullable=True)
 
