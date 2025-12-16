@@ -11,7 +11,6 @@ ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-print("URL cargada:", DATABASE_URL)
 
 
 if not DATABASE_URL:

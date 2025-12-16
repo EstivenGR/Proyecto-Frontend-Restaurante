@@ -18,7 +18,6 @@ origins = [
     "http://127.0.0.1:5173",
 ]
 
-# CORS para que el frontend consulte la API
 app.add_middleware(
  CORSMiddleware,
 allow_origins=origins, 
