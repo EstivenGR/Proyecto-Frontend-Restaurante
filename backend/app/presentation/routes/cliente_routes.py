@@ -1,4 +1,3 @@
-# app/routes/cliente_routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.schemas.cliente_schema import ClienteCreate, ClienteRead

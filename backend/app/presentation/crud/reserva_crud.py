@@ -11,7 +11,6 @@ from app.schemas.mesa_status import EstadoMesa
 
 
 def is_mesa_available(db: Session, mesa_id: int, target_date: date, target_hour: str) -> bool:
-    # 🛑 MODIFICACIÓN 1: Incluir la hora en la verificación de disponibilidad 🛑
     existing = db.query(Reserva).filter(
         Reserva.mesa_id == mesa_id,
         Reserva.start_time == target_date,
@@ -20,16 +19,12 @@ def is_mesa_available(db: Session, mesa_id: int, target_date: date, target_hour:
     return existing is None
 
 def create_reserva(db: Session, reserva_in: ReservaCreate) -> Reserva:
-    # 🛑 MODIFICACIÓN 2: Pasar el campo hora_reserva a is_mesa_available 🛑
     if not is_mesa_available(db, reserva_in.mesa_id, reserva_in.fecha_reserva, reserva_in.hora_reserva):
         raise ValueError("La mesa ya está reservada para esa fecha y hora")
 
     reserva_data = reserva_in.model_dump(by_alias=False)
     reserva_data['start_time'] = reserva_data.pop('fecha_reserva')
-    
-    # Nota: reserva_data ya contiene 'hora_reserva' porque viene en el esquema ReservaCreate
-    # y ahora pasa directamente a Reserva(**reserva_data)
-    
+     
     reserva = Reserva(**reserva_data)
     db.add(reserva)
     db.commit()
@@ -41,11 +36,10 @@ def create_reserva(db: Session, reserva_in: ReservaCreate) -> Reserva:
 
 def list_reservas_by_date(db: Session, target_date: date) -> List[ReservaRead]:
 
-    # 🛑 MODIFICACIÓN 3: Incluir el campo hora_reserva en el query 🛑
     reservas_con_datos = db.query(
         Reserva.id,
         Reserva.start_time.label('fecha_reserva'),
-        Reserva.hora_reserva, # <-- AÑADIDO
+        Reserva.hora_reserva,
         Reserva.requerimientos,
         Cliente.nombre.label('nombre_cliente'),
         Mesa.numero.label('numero_mesa')
@@ -53,7 +47,7 @@ def list_reservas_by_date(db: Session, target_date: date) -> List[ReservaRead]:
     ).join(Mesa, Reserva.mesa_id == Mesa.id
     ).filter(
         Reserva.start_time == target_date
-    ).order_by(Reserva.hora_reserva).all() # 🛑 MODIFICACIÓN 4: Ordenar por hora 🛑
+    ).order_by(Reserva.hora_reserva).all()
     
     return [ReservaRead.model_validate(r._asdict()) for r in reservas_con_datos]
 
