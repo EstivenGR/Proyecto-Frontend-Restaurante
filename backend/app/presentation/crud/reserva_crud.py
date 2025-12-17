@@ -39,7 +39,7 @@ def list_reservas_by_date(db: Session, target_date: date) -> List[ReservaRead]:
     reservas_con_datos = db.query(
         Reserva.id,
         Reserva.start_time.label('fecha_reserva'),
-        Reserva.hora_reserva, # <-- AÑADIDO
+        Reserva.hora_reserva,
         Reserva.requerimientos,
         Cliente.nombre.label('nombre_cliente'),
         Mesa.numero.label('numero_mesa')
